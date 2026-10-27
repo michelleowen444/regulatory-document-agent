@@ -176,5 +176,22 @@ class AgentTests(unittest.TestCase):
             send.assert_called_once()
             self.assertEqual(send.call_args.args[0]['To'], 'requester@example.invalid')
 
+    def test_singular_category_names(self):
+        for category in TYPES:
+            self.assertEqual(parse_request(f'M12205 {category[:-1]} files'), Request('M12205', category))
+
+    def test_real_email_singular_regression(self):
+        msg = compose('requester@example.invalid', 'agent@example.invalid', 'Document Request',
+                      'Hi Agent, can you give me other document files from M12205? Thanks!')
+        self.assertEqual(parse_request(message_text(msg)), Request('M12205', 'Other Documents'))
+
+    def test_category_whitespace_and_ambiguity(self):
+        for category in ('Other  Documents', 'Other\nDocument', 'Other\u00a0Documents'):
+            self.assertEqual(parse_request(f'M12205 {category}').category, 'Other Documents')
+        with self.assertRaises(ValueError):
+            parse_request('M12205 other document and transcript')
+        with self.assertRaises(ValueError):
+            parse_request('M12205 other documentary')
+
 if __name__ == '__main__':
     unittest.main()

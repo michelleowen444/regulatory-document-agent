@@ -24,7 +24,15 @@ def parse_request(text: str, use_ai: bool = False) -> Request:
     matters = set(re.findall(r'\bM\d{5}\b', text.upper()))
     if len(matters) != 1:
         raise ValueError('Please specify exactly one matter number, such as M12205.')
-    categories = [x for x in TYPES if re.search(r'\b' + re.escape(x) + r'\b', text, re.I)]
+    # Accept singular/plural category names and formatting whitespace while
+    # returning only canonical website tab labels. No fuzzy guessing.
+    categories = []
+    for category in TYPES:
+        words = category.split()
+        words[-1] = words[-1][:-1]  # All five canonical labels end in plural s.
+        pattern = r'\b' + r'\s+'.join(re.escape(word) for word in words) + r's?\b'
+        if re.search(pattern, text, re.I):
+            categories.append(category)
     if len(categories) > 1:
         raise ValueError('Please request one document type at a time.')
     if use_ai:

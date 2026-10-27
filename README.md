@@ -2,7 +2,7 @@
 
 A small Python pipeline for the Nova Scotia public documents database. It accepts a matter number and one document category, reads live metadata and all five tab counts, downloads up to ten public documents, builds a ZIP with an evidence manifest, and prepares or sends an email reply.
 
-The default request parser is deterministic. An optional OpenAI classifier is available with `--ai`; it interprets document categories only. Browser navigation, counts, filenames, recipients and packaging remain ordinary code.
+The default request parser is deterministic and accepts singular or plural category names, such as “Other Document” and “Other Documents”. An optional OpenAI classifier is available with `--ai`; it interprets document categories only. Browser navigation, counts, filenames, recipients and packaging remain ordinary code.
 
 ## How it works
 
@@ -138,7 +138,7 @@ The total is the **sum of tab entry counts**, not a claim that all files are uni
 
 ## Tested behavior
 
-16 offline tests pass. Live testing covered ten Other Documents, all six Key Documents, zero Transcripts, and seven public Exhibits with confidential entries skipped for M12205. The complete incoming-email-to-ZIP-reply workflow was also tested through Gmail, including an ordinary-subject request to the dedicated account. The initial site load sometimes takes over 30 seconds; the adapter allows 90 seconds.
+19 offline tests pass. Live testing covered ten Other Documents, all six Key Documents, zero Transcripts, and seven public Exhibits with confidential entries skipped for M12205. The complete incoming-email-to-ZIP-reply workflow was also tested through Gmail, including an ordinary-subject request to the dedicated account. The initial site load sometimes takes over 30 seconds; the adapter allows 90 seconds.
 
 Optional AI inference has been tested with mocked API responses only. Nonempty Recordings and Transcripts and all other matter layouts have not been exhaustively tested. This repository is not an always-on deployment.
 
