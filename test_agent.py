@@ -110,8 +110,9 @@ class AgentTests(unittest.TestCase):
                    IMAP_HOST='example.invalid', ALLOWED_SENDERS='')
         with tempfile.TemporaryDirectory() as tmp, patch.dict(os.environ, env), \
              patch('agent.imaplib.IMAP4_SSL', return_value=Inbox()), \
-             patch('browser.collect', return_value=result), patch('agent.send_message') as send:
-            poll(Path(tmp), False, False)
+             patch('browser.collect', return_value=result) as collect, patch('agent.send_message') as send:
+            poll(Path(tmp), False, False, headed=True)
+            self.assertTrue(collect.call_args.args[2])
             send.assert_not_called()
             poll(Path(tmp), True, False)
             poll(Path(tmp), True, False)

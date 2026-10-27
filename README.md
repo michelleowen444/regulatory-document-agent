@@ -147,3 +147,13 @@ Optional AI inference has been tested with mocked API responses only. Nonempty R
 Reviewers can test the core retrieval without any credentials. To test email on their own computer, they should configure a mailbox they control using `.env.example`; no account passwords or tokens are included in this repository. The owner’s dedicated agent address is `michelle.regulatory.agent@gmail.com`, but email replies require the worker to be running.
 
 For a dedicated inbox, keep `SUBJECT_PREFIX=` blank. Example email body: `Please send me Other Documents from M12205.` Any subject is accepted. Use the prefix setting only if sharing a personal inbox.
+
+## Full email demo with a visible browser
+
+After configuring your own dedicated mailbox in `.env`, send it a fresh email from another address containing `Please send Other Documents from M12205`. Leave the request unread, then run:
+
+```powershell
+.\.venv\Scripts\python.exe agent.py watch --once --send --headed
+```
+
+On macOS/Linux use `.venv/bin/python` in place of the Windows interpreter path. This performs one inbox poll, shows the browser retrieving the documents, and sends the ZIP reply. Unlike `agent.py run`, the request comes from email. `--send` enables actual replies to eligible unread requests. The process then exits; it is not continuously hosted.

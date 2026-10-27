@@ -113,7 +113,7 @@ class Journal:
         self.db.execute('INSERT OR REPLACE INTO jobs VALUES (?,?,?)', (key, status, str(folder)))
         self.db.commit()
 
-def poll(root, send, ai):
+def poll(root, send, ai, headed=False):
     required('AGENT_EMAIL')
     journal = Journal(root / 'state.sqlite3')
     try:
@@ -168,7 +168,7 @@ def poll(root, send, ai):
                     if state == 'preview' and (folder / 'reply.eml').exists():
                         reply = email.message_from_bytes((folder / 'reply.eml').read_bytes(), policy=policy.default)
                     else:
-                        reply = create_reply(message_text(msg), sender, folder, ai=ai,
+                        reply = create_reply(message_text(msg), sender, folder, ai=ai, headed=headed,
                                              reply_id=str(msg.get('Message-ID', '')))
                     if send:
                         # SMTP has no exactly-once guarantee: never retry an uncertain send automatically.
@@ -204,6 +204,7 @@ def main():
     watch.add_argument('--send', action='store_true')
     watch.add_argument('--ai', action='store_true')
     watch.add_argument('--once', action='store_true')
+    watch.add_argument('--headed', action='store_true', help='Show the browser while processing email')
     args = parser.parse_args()
     if args.command == 'run':
         if args.send and args.demo:
@@ -233,7 +234,7 @@ def main():
                 handle.write(str(os.getpid()))
             while True:
                 try:
-                    poll(root, args.send, args.ai)
+                    poll(root, args.send, args.ai, args.headed)
                 except Exception:
                     LOG.exception('Mailbox poll failed')
                     if args.once:
