@@ -2,7 +2,29 @@
 
 A small Python pipeline for the Nova Scotia public documents database. It accepts a matter number and one document category, reads live metadata and all five tab counts, downloads up to ten public documents, builds a ZIP with an evidence manifest, and prepares or sends an email reply.
 
-Built with AI assistance. The default request parser is deterministic. An optional OpenAI classifier is available with `--ai`; it interprets document categories only. Browser navigation, counts, filenames, recipients and packaging remain ordinary code.
+The default request parser is deterministic. An optional OpenAI classifier is available with `--ai`; it interprets document categories only. Browser navigation, counts, filenames, recipients and packaging remain ordinary code.
+
+## How it works
+
+The local demo follows the solid arrows. The email worker uses the same processing steps, with an additional inbox reader and SMTP sender.
+
+```mermaid
+flowchart TD
+    A["Local request<br/>M12205 + Other Documents"] --> B["Validate request<br/>One matter + one document category"]
+    I["Email request<br/>Worker must be running"] -.-> B
+    B --> C["Navigate the regulator website<br/>Verify the matter; read metadata and all five tab counts"]
+    C --> D["Download up to 10 public documents<br/>Track document IDs and download failures"]
+    D --> E["Package and summarize<br/>ZIP + manifest with file hashes"]
+    E --> F["Local demo outputs<br/>ZIP, summary, manifest and email preview"]
+    E -. "Email mode" .-> G["Send reply through SMTP<br/>Attach ZIP when within the size limit"]
+
+    classDef local fill:#e8f1ff,stroke:#3562a6,color:#172d4b;
+    classDef optional fill:#f3f4f6,stroke:#7a8290,color:#303846;
+    class A,B,C,D,E,F local;
+    class I,G optional;
+```
+
+**What is demonstrated locally:** live website retrieval and creation of the ZIP, summary, manifest, and email preview. No email is sent by the local demo command. If no files are downloaded, no ZIP is created. Optional email delivery requires mailbox credentials and a running worker.
 
 ## Reviewer quick start (Python 3.10+)
 
